@@ -1,115 +1,90 @@
-$(document).ready(function () {
-  //sticky header
-  $(window).scroll(function () {
-    if ($(this).scrollTop() > 1) {
-      $(".header-area").addClass("sticky");
-    } else {
-      $(".header-area").removeClass("sticky");
-    }
+window.addEventListener("load", () => {
+  const form = document.querySelector("#new-task-form");
+  const input = document.querySelector("#new-task-input");
+  const list_el = document.querySelector("#tasks");
 
-    // Update the active section in the header
-    updateActiveSection();
+  // Load saved tasks from local storage
+  const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+  savedTasks.forEach((taskText) => {
+    const task_el = createTaskElement(taskText);
+    list_el.appendChild(task_el);
   });
-
-  $(".header ul li a").click(function (e) {
-    e.preventDefault();
-
-    var target = $(this).attr("href");
-
-    if ($(target).hasClass("active-section")) {
-      return;
-    }
-
-    if (target === "#home") {
-      $("html, body").animate(
-        {
-          scrollTop: 0,
-        },
-        500
-      );
-    } else {
-      var offset = $(target).offset().top - 40;
-
-      $("html, body").animate(
-        {
-          scrollTop: offset,
-        },
-        500
-      );
-    }
-
-    $(".header ul li a").removeClass("active");
-    $(this).addClass("active");
-  });
-
-  //Initial content revealing js
-  ScrollReveal({
-    distance: "100px",
-    duration: 2000,
-    delay: 200,
-  });
-
-  ScrollReveal().reveal(
-    ".header a, .profile-photo, .about-content, .education",
-    {
-      origin: "left",
-    }
-  );
-  ScrollReveal().reveal(
-    ".header ul, .profile-text, .about-skills, .internship",
-    {
-      origin: "right",
-    }
-  );
-  ScrollReveal().reveal(".project-title, .contact-title", {
-    origin: "top",
-  });
-  ScrollReveal().reveal(".projects, .contact", {
-    origin: "bottom",
-  });
-
-  //contact form to excel sheet
-  const scriptURL =
-    "https://script.google.com/macros/s/AKfycbzUSaaX3XmlE5m9YLOHOBrRuCh2Ohv49N9bs4bew7xPd1qlgpvXtnudDs5Xhp3jF-Fx/exec";
-  const form = document.forms["submitToGoogleSheet"];
-  const msg = document.getElementById("msg");
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    fetch(scriptURL, { method: "POST", body: new FormData(form) })
-      .then((response) => {
-        msg.innerHTML = "Message sent successfully";
-        setTimeout(function () {
-          msg.innerHTML = "";
-        }, 5000);
-        form.reset();
-      })
-      .catch((error) => console.error("Error!", error.message));
+
+    const task = input.value;
+    const task_el = createTaskElement(task);
+
+    list_el.appendChild(task_el);
+
+    // Save tasks to local storage
+    const tasks = Array.from(list_el.querySelectorAll(".text")).map(
+      (task) => task.value
+    );
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+
+    input.value = "";
   });
-});
 
-function updateActiveSection() {
-  var scrollPosition = $(window).scrollTop();
+  function createTaskElement(taskText) {
+    const task_el = document.createElement("div");
+    task_el.classList.add("task");
 
-  // Checking if scroll position is at the top of the page
-  if (scrollPosition === 0) {
-    $(".header ul li a").removeClass("active");
-    $(".header ul li a[href='#home']").addClass("active");
-    return;
+    const task_content_el = document.createElement("div");
+    task_content_el.classList.add("content");
+
+    task_el.appendChild(task_content_el);
+
+    const task_input_el = document.createElement("input");
+    task_input_el.classList.add("text");
+    task_input_el.type = "text";
+    task_input_el.value = taskText;
+    task_input_el.setAttribute("readonly", "readonly");
+
+    task_content_el.appendChild(task_input_el);
+
+    const task_actions_el = document.createElement("div");
+    task_actions_el.classList.add("actions");
+
+    const task_edit_el = document.createElement("button");
+    task_edit_el.classList.add("edit");
+    task_edit_el.innerText = "Edit";
+
+    const task_delete_el = document.createElement("button");
+    task_delete_el.classList.add("delete");
+    task_delete_el.innerText = "Delete";
+
+    task_actions_el.appendChild(task_edit_el);
+    task_actions_el.appendChild(task_delete_el);
+
+    task_el.appendChild(task_actions_el);
+
+    task_edit_el.addEventListener("click", () => {
+      if (task_edit_el.innerText.toLowerCase() == "edit") {
+        task_edit_el.innerText = "Save";
+        task_input_el.removeAttribute("readonly");
+        task_input_el.focus();
+      } else {
+        task_edit_el.innerText = "Edit";
+        task_input_el.setAttribute("readonly", "readonly");
+        updateLocalStorageTasks();
+      }
+    });
+
+    task_delete_el.addEventListener("click", () => {
+      list_el.removeChild(task_el);
+      updateLocalStorageTasks();
+    });
+
+    return task_el;
   }
 
-  // Iterate through each section and update the active class in the header
-  $("section").each(function () {
-    var target = $(this).attr("id");
-    var offset = $(this).offset().top;
-    var height = $(this).outerHeight();
-
-    if (
-      scrollPosition >= offset - 40 &&
-      scrollPosition < offset + height - 40
-    ) {
-      $(".header ul li a").removeClass("active");
-      $(".header ul li a[href='#" + target + "']").addClass("active");
-    }
-  });
-}
+  function updateLocalStorageTasks() {
+    const tasks = Array.from(list_el.querySelectorAll(".text")).map(
+      (task) => task.value
+    );
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }
+});
