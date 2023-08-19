@@ -7,7 +7,7 @@
     <meta name="description" content="Simple Calculator With Dark Mode." />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="assets/calculator.ico" />
-    <link rel="stylesheet" href="dark.css" id="theme" />
+    <link rel="stylesheet" href="styles.css" id="theme" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -62,10 +62,11 @@
           <input type="button" value="x" onclick="liveScreen('*')" />
         </div>
         <div class="fifth-row">
-          <input type="button" value="/" onclick="liveScreen('/')" />
-          <input type="button" value="0" onclick="liveScreen(0)" />
           <input type="button" value="." onclick="liveScreen('.')" />
+          <input type="button" value="0" onclick="liveScreen(0)" />
           <input type="button" value="=" onclick="calculate(result.value)" />
+          <input type="button" value="/" onclick="liveScreen('/')" />
+
         </div>
       </div>
     </div>
