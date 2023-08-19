@@ -35,7 +35,7 @@ header {
 header h1 {
   font-size: 2.5rem;
   font-weight: 550;
-  color: rgb(208, 24, 100);
+  color: rgb(27, 23, 94);
   margin-bottom: 0.6rem;
   margin-top: 3rem;
 }
@@ -95,8 +95,7 @@ main {
 }
 
 .task-list h2 {
-  font-size: 1.5rem;
-  font-weight: 400;
+  font-size: 2rem;
   color: var(--darker);
   margin-bottom: 1rem;
 }
